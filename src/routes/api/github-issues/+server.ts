@@ -21,10 +21,9 @@ const toPreview = (body: string): string => {
 			return '';
 		});
 	}
-	s = s.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
 	s = s.replace(/`([^`]+)`/g, '$1');
+	s = s.replace(/`/g, '');
 	s = s.replace(/\s+/g, ' ').trim();
-	if (s.length > 160) s = s.slice(0, 157).trimEnd() + '…';
 
 	if (!s || s.length < 12) {
 		const fallback = body
@@ -127,7 +126,8 @@ export const GET: RequestHandler = async ({ fetch }) => {
 							timeAgo: item.created_at
 								? new Date(item.created_at).toLocaleDateString('id-ID', {
 										day: 'numeric',
-										month: 'short'
+										month: 'short',
+										year: 'numeric'
 									})
 								: 'recently',
 							assignee: item.assignee

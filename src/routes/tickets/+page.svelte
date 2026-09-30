@@ -11,7 +11,8 @@
 		User02Icon,
 		ArrowLeft01Icon,
 		GitPullRequestIcon,
-		ArrowRight01Icon
+		ArrowRight01Icon,
+		CheckmarkCircle02Icon,
 	} from '@hugeicons/core-free-icons';
 	import Button from '@/lib/components/ui/button/button.svelte';
 	import NewIssueModal from '@/lib/components/tickets/new-issue-modal.svelte';
@@ -289,51 +290,28 @@
 							<p class="mt-1 text-xs text-zinc-400">Try adjusting your filters or search query.</p>
 						</div>
 					{:else}
-						<div class="divide-y divide-zinc-100">
-							{#each paginatedIssues as issue (issue.id)}
-								{@const isSelected = selectedIssueIds.has(issue.id)}
-								<div
-									class="group relative flex gap-3.5 p-4 transition-colors hover:bg-zinc-50/70 {isSelected
-										? 'bg-blue-50/40'
-										: ''}"
-								>
-									{#if isSelected}
-										<span
-											class="absolute inset-y-0 left-0 w-[3px] bg-blue-600"
-											aria-hidden="true"
-										></span>
-									{/if}
-									<input
-										type="checkbox"
-										checked={isSelected}
-										onchange={() => toggleSelect(issue.id)}
-										class="mt-1.5 h-3.5 w-3.5 rounded border-zinc-300 bg-white text-zinc-900 focus:ring-zinc-900 sm:mt-1"
-									/>
-
-									<div class="mt-1 shrink-0 sm:mt-1.5">
+						{#each paginatedIssues as issue (issue.id)}
+								<div class="group flex items-center gap-3.5 p-4 transition-colors hover:bg-zinc-50/70">
+									<div class="shrink-0">
 										{#if issue.state === 'open'}
 											<span
-												class="flex h-5 w-5 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-600"
+												class="flex h-6 w-6 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-600"
 												title="Open"
 											>
-												<span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+												<span class="h-2 w-2 rounded-full bg-emerald-500"></span>
 											</span>
 										{:else}
 											<span
-												class="flex h-5 w-5 items-center justify-center rounded-full bg-[#8250df] text-white"
+												class="flex h-6 w-6 items-center justify-center rounded-full bg-[#8250df] text-white"
 												title="Closed"
 											>
-												<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"
-													><path
-														d="M13.78 3.53a.75.75 0 010 1.06l-6.5 6.5a.75.75 0 01-1.06 0L2.22 7.09a.75.75 0 111.06-1.06L6 8.71l5.72-5.72a.75.75 0 011.06 0z"
-													/></svg
-												>
+												<HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} />
 											</span>
 										{/if}
 									</div>
 
 									<div class="min-w-0 flex-1">
-										<div class="flex flex-wrap items-start gap-1.5">
+										<div class="flex flex-wrap items-center gap-1.5">
 											<a
 												href={issue.htmlUrl}
 												target="_blank"
@@ -342,9 +320,7 @@
 											>
 												{issue.title}
 											</a>
-											<span class="shrink-0 text-[11px] font-medium text-zinc-400 pt-0.5"
-												>#{issue.number}</span
-											>
+											<span class="shrink-0 text-[11px] font-medium text-zinc-400">#{issue.number}</span>
 											{#if issue.isPr}
 												<span
 													class="inline-flex items-center rounded-md border border-zinc-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-zinc-600"
@@ -364,13 +340,14 @@
 												<button
 													type="button"
 													onclick={() => (selectedLabel = l.name)}
-													class="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium leading-none {l.bg} {l.text} {l.border ?? 'border-transparent'} hover:opacity-80"
+													class="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium leading-none {l.bg} {l.text} {l.border ?? 'border-zinc-200'} hover:opacity-80"
 												>
-													{l.name}
+													<span>{l.name}</span>
+													<HugeiconsIcon icon={ArrowRight01Icon} size={12} />
 												</button>
 											{/each}
 
-											<span class="ml-1 flex items-center gap-1.5 text-xs text-zinc-400">
+											<span class="ml-1 inline-flex items-center gap-1.5 text-xs text-zinc-400">
 												<span class="inline-flex items-center gap-1">
 													<HugeiconsIcon icon={Comment01Icon} size={12} />
 													<span class="tabular-nums">{issue.commentsCount}</span>
@@ -401,26 +378,16 @@
 										</div>
 									</div>
 
-									<div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end sm:gap-1.5 sm:pt-0.5">
+									<div class="hidden shrink-0 sm:flex sm:items-center sm:pt-1">
 										<span
-											class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] leading-none font-semibold {getStatusPill(
-												issue.status
-											)}"
+											class="inline-flex items-center justify-center gap-1.5 rounded-full border border-zinc-200 bg-white px-2.5 py-1 text-[11px] font-medium leading-none text-zinc-600"
 										>
-											{issue.status}
-										</span>
-										<span
-											class="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500"
-										>
-											<span class="h-1.5 w-1.5 rounded-full {issue.state === 'open'
-												? 'bg-emerald-500'
-												: 'bg-[#8250df]'}"></span>
-											{issue.state}
+											<span class="h-1.5 w-1.5 shrink-0 rounded-full {issue.state === 'open' ? 'bg-emerald-500' : 'bg-[#8250df]'}"></span>
+											<span class="leading-none">{issue.state}</span>
 										</span>
 									</div>
 								</div>
 							{/each}
-						</div>
 					{/if}
 				</div>
 
