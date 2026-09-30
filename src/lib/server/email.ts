@@ -215,14 +215,18 @@ const baseTemplate = (opts: {
 			<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
 				<tr>
 					<td width="60%" style="vertical-align:middle;padding-right:8px">
-						<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:12px 16px">
+						<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:12px 18px">
 							<tr>
-								<td style="vertical-align:middle;width:24px">
-									<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
-								</td>
-								<td style="vertical-align:middle;padding-left:8px">
-									<span style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:12px;font-weight:700;color:#1e293b">Repo ID:</span>
-									<span style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:12px;font-weight:600;color:#0066ff;margin-left:4px">${repoPill}</span>
+								<td align="left" style="vertical-align:middle;text-align:left">
+									<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="left"><tr>
+										<td style="vertical-align:middle;width:20px;text-align:left">
+											<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0066ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+										</td>
+										<td style="vertical-align:middle;padding-left:8px;text-align:left">
+											<span style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:12px;font-weight:700;color:#1e293b">Repo ID:</span>
+											<span style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:12px;font-weight:600;color:#0066ff;margin-left:4px">${repoPill}</span>
+										</td>
+									</tr></table>
 								</td>
 							</tr>
 						</table>
