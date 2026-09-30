@@ -6,11 +6,27 @@ import { sendIssueNotification } from '@/lib/server/email.js';
 const extractAuthenticReport = (
 	body: string
 ): { email: string; title: string; repo: string; author: string; htmlUrl?: string } | null => {
-	const emailMatch = body.match(/email\s*:\s*([^\s<>]+@[^\s<>]+\.[^\s<>]+)/i);
-	if (!emailMatch) return null;
+	// GitHub Issue Forms render as "### Notification email\n\nemail@domain"
+	// legacy inline format is "email: email@domain"
+	let email: string | null = null;
+
+	const formMatch = body.match(/###\s*Notification email\s*\n+\s*([^\s<>]+@[^\s<>]+\.[^\s<>]+)/i);
+	if (formMatch) email = formMatch[1].trim();
+
+	if (!email) {
+		const inlineMatch = body.match(/email\s*:\s*([^\s<>]+@[^\s<>]+\.[^\s<>]+)/i);
+		if (inlineMatch) email = inlineMatch[1].trim();
+	}
+
+	// fallback: any email in body (jaga2 format berubah lagi)
+	if (!email) {
+		const anyMatch = body.match(/([^\s<>]+@[^\s<>]+\.[^\s<>]+)/);
+		if (anyMatch) email = anyMatch[1].trim();
+	}
+
+	if (!email) return null;
 
 	const titleMatch = body.match(/^###\s*(.+)\n/m);
-	const email = emailMatch[1].trim();
 	const titleRaw = titleMatch ? titleMatch[1].trim().slice(0, 120) : 'New GitHub Issue';
 	return { email, title: titleRaw, repo: '', author: '', htmlUrl: undefined };
 };
