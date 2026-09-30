@@ -170,11 +170,11 @@ const baseTemplate = (opts: {
 	<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px;max-width:100%">
 		<tr><td align="center" style="padding:8px 0 18px">
 			<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-				<td style="width:28px;height:28px;background:#18181b;border-radius:8px;text-align:center;vertical-align:middle">
-					<span style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-weight:800;font-size:13px;color:#fff;line-height:28px;display:block">P</span>
+				<td style="vertical-align:middle">
+					<img src="https://raw.githubusercontent.com/polinema-ui/ticket/main/src/lib/assets/logo.png" width="32" height="32" alt="Polinema Ticket Logo" style="display:block;border-radius:8px" />
 				</td>
-				<td style="padding-left:8px;vertical-align:middle">
-					<span style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:13px;letter-spacing:-.02em;color:#18181b">Polinema Ticket</span>
+				<td style="padding-left:10px;vertical-align:middle">
+					<span style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:14px;letter-spacing:-.02em;color:#18181b">Polinema Ticket</span>
 					<span style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:11px;color:#71717a"> · p-ui</span>
 				</td>
 			</tr></table>
@@ -194,7 +194,7 @@ const baseTemplate = (opts: {
 					${
 						opts.htmlUrl
 							? `<div style="text-align:center;padding:18px 0 4px">
-								<a href="${esc(opts.htmlUrl)}" style="display:inline-block;padding:11px 22px;background:#18181b;color:#ffffff;border-radius:9999px;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:-.01em">${esc(opts.ctaLabel || 'View on GitHub →')}</a>
+								<a href="${esc(opts.htmlUrl)}" style="display:inline-block;padding:11px 24px;background:#18181b;color:#ffffff;border-radius:9999px;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:-.01em">${esc(opts.ctaLabel || 'View on GitHub')} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-left:4px"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
 							</div>
 							<div style="text-align:center;padding-top:8px">
 								<a href="${esc(opts.htmlUrl)}" style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:11px;color:#2563eb;word-break:break-all;text-decoration:none">${esc(opts.htmlUrl)}</a>
