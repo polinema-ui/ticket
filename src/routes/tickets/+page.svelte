@@ -15,6 +15,7 @@
 		CheckmarkCircle02Icon,
 	} from '@hugeicons/core-free-icons';
 	import Button from '@/lib/components/ui/button/button.svelte';
+	import Badge from '@/lib/components/ui/badge/badge.svelte';
 	import NewIssueModal from '@/lib/components/tickets/new-issue-modal.svelte';
 	import type { IssueItem, IssueTemplate } from '@/lib/types/ticket.js';
 
@@ -451,9 +452,9 @@
 									onclick={() => (selectedLabel = selectedLabel === lbl.name ? null : lbl.name)}
 									class="flex w-full items-center justify-between text-left transition-opacity hover:opacity-80"
 								>
-									<span class="rounded-full border px-2.5 py-0.5 text-[11px] font-medium leading-none {lbl.color}">
+									<Badge variant="outline" class="rounded-full border-zinc-900 px-3 py-1 text-[11px] font-medium text-zinc-900 bg-white shadow-2xs">
 										{lbl.name}
-									</span>
+									</Badge>
 									<span class="text-xs font-medium text-zinc-400">{lbl.count}</span>
 								</button>
 							{/each}
