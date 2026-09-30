@@ -20,7 +20,7 @@ export default defineConfig(
 		rules: {
 			// typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
 			// see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
-			"no-undef": 'off'
+			'no-undef': 'off'
 		}
 	},
 	{
@@ -34,8 +34,27 @@ export default defineConfig(
 		}
 	},
 	{
-		// Override or add rule settings here, such as:
-		// 'svelte/button-has-type': 'error'
-		rules: {}
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					patterns: [
+						{
+							group: ['$app/*', '$lib', '$lib/*', '$env/*'],
+							message: 'Pakai @/ alias, jangan $ (ex: @/lib/utils, @/app/paths)'
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		files: ['src/app/**'],
+		rules: { 'no-restricted-imports': 'off' }
+	},
+	{
+		files: ['src/lib/components/hero/hero-grid.svelte'],
+		linterOptions: { reportUnusedDisableDirectives: 'off' },
+		rules: { 'svelte/no-navigation-without-resolve': 'off' }
 	}
 );

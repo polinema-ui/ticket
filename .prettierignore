@@ -5,5 +5,20 @@ yarn.lock
 bun.lock
 bun.lockb
 
+# SvelteKit / Build
+.svelte-kit/
+build/
+.vercel/
+.output/
+test-results/
+
+# Agent / Skill references — contain diff markup (+++...+++) that breaks prettier-plugin-tailwindcss
+.cursor/
+.claude/
+.gemini/
+.github/
+.opencode/
+.vscode/
+
 # Miscellaneous
 /static/
