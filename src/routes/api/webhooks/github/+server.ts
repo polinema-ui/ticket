@@ -18,7 +18,7 @@ const extractAuthenticReport = (
 		if (inlineMatch) email = inlineMatch[1].trim();
 	}
 
-	// fallback: any email in body (jaga2 format berubah lagi)
+	// fallback: any email in body
 	if (!email) {
 		const anyMatch = body.match(/([^\s<>]+@[^\s<>]+\.[^\s<>]+)/);
 		if (anyMatch) email = anyMatch[1].trim();
@@ -68,32 +68,72 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ error: 'Invalid JSON' }, { status: 400 });
 	}
 
-	const action = payload.action as string | undefined;
-	if (action !== 'opened' && action !== 'reopened') {
+	const actionVal = payload.action;
+	const action = typeof actionVal === 'string' ? actionVal : undefined;
+	if (action !== 'opened' && action !== 'reopened' && action !== 'assigned') {
+		return json({ ok: true, skipped: true, reason: `unsupported action: ${action ?? 'unknown'}` });
+	}
+
+	// Narrow issue object without inline casts
+	let issueTitle: string | undefined;
+	let issueBody: string | undefined;
+	let issueHtmlUrl: string | undefined;
+	let issueUserLogin: string | undefined;
+	let issueNumber: number | undefined;
+
+	const issueVal = payload.issue;
+	if (issueVal && typeof issueVal === 'object' && 'title' in issueVal) {
+		const rec = issueVal as Record<string, unknown>;
+		if (typeof rec.title === 'string') issueTitle = rec.title;
+		if (typeof rec.body === 'string') issueBody = rec.body;
+		if (typeof rec.html_url === 'string') issueHtmlUrl = rec.html_url;
+		if (typeof rec.number === 'number') issueNumber = rec.number;
+		const userVal = rec.user;
+		if (userVal && typeof userVal === 'object' && 'login' in userVal) {
+			const loginVal = (userVal as Record<string, unknown>).login;
+			if (typeof loginVal === 'string') issueUserLogin = loginVal;
+		}
+	}
+
+	let repoName: string | undefined;
+	const repoVal = payload.repository;
+	if (repoVal && typeof repoVal === 'object' && 'name' in repoVal) {
+		const nameVal = (repoVal as Record<string, unknown>).name;
+		if (typeof nameVal === 'string') repoName = nameVal;
+	}
+
+	let assigneeLogin: string | undefined;
+	const assigneeVal = payload.assignee;
+	if (assigneeVal && typeof assigneeVal === 'object' && 'login' in assigneeVal) {
+		const loginVal = (assigneeVal as Record<string, unknown>).login;
+		if (typeof loginVal === 'string') assigneeLogin = loginVal;
+	}
+
+	if (!issueTitle || !issueBody) {
 		return json({ ok: true, skipped: true });
 	}
 
-	const issue = payload.issue as
-		{ title?: string; body?: string; html_url?: string; user?: { login?: string } } | undefined;
-	const repo = payload.repository as { name?: string } | undefined;
-
-	if (!issue?.title || !issue?.body) {
-		return json({ ok: true, skipped: true });
-	}
-
-	const extracted = extractAuthenticReport(issue.body);
+	const extracted = extractAuthenticReport(issueBody);
 	if (!extracted) return json({ ok: true, skipped: true });
 
 	try {
+		const isAssigned = action === 'assigned';
+		const displayTitle = isAssigned
+			? `[Assigned to ${assigneeLogin ?? 'someone'}] ${issueTitle}`
+			: issueTitle;
+		const displayBody = isAssigned
+			? `Issue #${issueNumber ?? ''} assigned to ${assigneeLogin ?? 'someone'}.\n\n---\n\n${issueBody}`
+			: issueBody;
+
 		await sendIssueNotification({
-			title: issue.title,
-			body: issue.body,
+			title: displayTitle,
+			body: displayBody,
 			reporterEmail: extracted.email,
-			repo: repo?.name || extracted.repo || 'p-ui',
-			author: issue.user?.login || extracted.author || 'github-user',
-			htmlUrl: issue.html_url
+			repo: repoName || extracted.repo || 'p-ui',
+			author: issueUserLogin || extracted.author || 'github-user',
+			htmlUrl: issueHtmlUrl
 		});
-		return json({ ok: true });
+		return json({ ok: true, assigned: isAssigned });
 	} catch (err) {
 		const message = err instanceof Error ? err.message : 'Failed to send email';
 		return json({ error: message }, { status: 500 });
