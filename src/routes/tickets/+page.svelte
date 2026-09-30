@@ -455,7 +455,7 @@
 									<Badge
 										variant={selectedLabel === lbl.name ? 'default' : 'outline'}
 										style={lbl.colorHex ? `background-color: #${lbl.colorHex}22; color: #${lbl.colorHex}; border-color: #${lbl.colorHex}66` : ''}
-										class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold leading-none shadow-2xs transition-all hover:scale-[1.02]"
+										class="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-[11px] font-semibold leading-normal shadow-2xs transition-all hover:scale-[1.02]"
 									>
 										{lbl.name}
 									</Badge>
