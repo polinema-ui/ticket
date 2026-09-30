@@ -33,7 +33,7 @@
 	let templates = $state<IssueTemplate[]>([]);
 	let repos = $state<{ name: string; html_url: string; open_issues_count: number }[]>([]);
 	let repoMeta = $state<{
-		labels: Record<string, { name: string; color: string; count: number }[]>;
+		labels: Record<string, { name: string; color: string; colorHex?: string; count: number }[]>;
 		assignees: Record<string, { name: string; avatar: string; count: number }[]>;
 	}>({ labels: {}, assignees: {} });
 
@@ -452,7 +452,11 @@
 									onclick={() => (selectedLabel = selectedLabel === lbl.name ? null : lbl.name)}
 									class="flex w-full items-center justify-between text-left transition-opacity hover:opacity-80"
 								>
-									<Badge variant="outline" class="rounded-full px-2.5 py-0.5 text-[11px] font-medium leading-none {lbl.color}">
+									<Badge
+										variant={selectedLabel === lbl.name ? 'default' : 'outline'}
+										style={lbl.colorHex ? `background-color: #${lbl.colorHex}22; color: #${lbl.colorHex}; border-color: #${lbl.colorHex}66` : ''}
+										class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold leading-none shadow-2xs transition-all hover:scale-[1.02]"
+									>
 										{lbl.name}
 									</Badge>
 									<span class="text-xs font-medium text-zinc-400">{lbl.count}</span>

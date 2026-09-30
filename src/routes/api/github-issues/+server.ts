@@ -166,6 +166,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 						).length;
 						return {
 							name: l.name,
+							colorHex: l.color,
 							color: `bg-[#${l.color}15] text-[#${l.color}] border-[#${l.color}30]`,
 							count
 						};
