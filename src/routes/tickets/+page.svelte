@@ -293,84 +293,129 @@
 							{#each paginatedIssues as issue (issue.id)}
 								{@const isSelected = selectedIssueIds.has(issue.id)}
 								<div
-									class="group flex items-start gap-3 p-4 transition-colors hover:bg-zinc-50/70 sm:items-center"
+									class="group relative flex gap-3.5 p-4 transition-colors hover:bg-zinc-50/70 {isSelected
+										? 'bg-blue-50/40'
+										: ''}"
 								>
+									{#if isSelected}
+										<span
+											class="absolute inset-y-0 left-0 w-[3px] bg-blue-600"
+											aria-hidden="true"
+										></span>
+									{/if}
 									<input
 										type="checkbox"
 										checked={isSelected}
 										onchange={() => toggleSelect(issue.id)}
-										class="mt-1 h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500 sm:mt-0"
+										class="mt-1.5 h-3.5 w-3.5 rounded border-zinc-300 bg-white text-zinc-900 focus:ring-zinc-900 sm:mt-1"
 									/>
 
-									<div class="mt-0.5 shrink-0 text-emerald-600 sm:mt-0">
+									<div class="mt-1 shrink-0 sm:mt-1.5">
 										{#if issue.state === 'open'}
 											<span
-												class="inline-block h-2.5 w-2.5 rounded-full border-2 border-emerald-500 bg-white"
-											></span>
+												class="flex h-5 w-5 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-600"
+												title="Open"
+											>
+												<span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+											</span>
 										{:else}
 											<span
-												class="inline-block h-2.5 w-2.5 rounded-full border-2 border-purple-500 bg-purple-500"
-											></span>
+												class="flex h-5 w-5 items-center justify-center rounded-full bg-[#8250df] text-white"
+												title="Closed"
+											>
+												<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"
+													><path
+														d="M13.78 3.53a.75.75 0 010 1.06l-6.5 6.5a.75.75 0 01-1.06 0L2.22 7.09a.75.75 0 111.06-1.06L6 8.71l5.72-5.72a.75.75 0 011.06 0z"
+													/></svg
+												>
+											</span>
 										{/if}
 									</div>
 
 									<div class="min-w-0 flex-1">
-										<div class="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
-											<span class="shrink-0 text-xs font-semibold text-zinc-400"
-												>#{issue.number}</span
-											>
+										<div class="flex flex-wrap items-start gap-1.5">
 											<a
 												href={issue.htmlUrl}
 												target="_blank"
 												rel="noopener noreferrer"
-												class="text-xs font-bold text-zinc-900 group-hover:text-blue-600 sm:text-sm"
+												class="text-[13px] font-semibold leading-5 text-zinc-900 hover:text-blue-600 hover:underline decoration-blue-600/30 underline-offset-2 sm:text-sm"
 											>
 												{issue.title}
 											</a>
+											<span class="shrink-0 text-[11px] font-medium text-zinc-400 pt-0.5"
+												>#{issue.number}</span
+											>
+											{#if issue.isPr}
+												<span
+													class="inline-flex items-center rounded-md border border-zinc-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-zinc-600"
+													>PR</span
+												>
+											{/if}
 										</div>
 
-										<p class="mt-1 line-clamp-1 text-xs text-zinc-500">
-											{issue.description}
-										</p>
+										{#if issue.description}
+											<p class="mt-1 line-clamp-2 text-xs leading-5 text-zinc-500 sm:line-clamp-1">
+												{issue.description}
+											</p>
+										{/if}
 
-										<div class="mt-2 flex flex-wrap items-center gap-1.5">
+										<div class="mt-2.5 flex flex-wrap items-center gap-1.5">
 											{#each issue.labels as l (l.name)}
 												<button
 													type="button"
 													onclick={() => (selectedLabel = l.name)}
-													class="rounded-full px-2 py-0.5 text-[11px] leading-tight font-semibold {l.bg} {l.text} hover:opacity-80"
+													class="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium leading-none {l.bg} {l.text} {l.border ?? 'border-transparent'} hover:opacity-80"
 												>
 													{l.name}
 												</button>
 											{/each}
 
-											<div class="ml-auto flex items-center gap-3 text-xs text-zinc-400 sm:ml-4">
+											<span class="ml-1 flex items-center gap-1.5 text-xs text-zinc-400">
 												<span class="inline-flex items-center gap-1">
 													<HugeiconsIcon icon={Comment01Icon} size={12} />
-													<span>{issue.commentsCount}</span>
+													<span class="tabular-nums">{issue.commentsCount}</span>
 												</span>
-
-												<div class="flex items-center gap-1">
+												<span class="h-3 w-px bg-zinc-200" aria-hidden="true"></span>
+												<span class="inline-flex items-center gap-1.5">
 													<img
 														src={issue.author.avatar}
 														alt={issue.author.name}
-														class="h-4 w-4 rounded-full object-cover"
+														class="h-4 w-4 rounded-full object-cover ring-1 ring-black/5"
 													/>
-													<span class="text-zinc-600">{issue.author.name}</span>
-												</div>
-
-												<span class="text-zinc-400">{issue.timeAgo}</span>
-											</div>
+													<span class="font-medium text-zinc-600">{issue.author.name}</span>
+												</span>
+												{#if issue.assignee}
+													<span class="text-zinc-300">→</span>
+													<span class="inline-flex items-center gap-1">
+														<img
+															src={issue.assignee.avatar}
+															alt={issue.assignee.name}
+															class="h-4 w-4 rounded-full object-cover ring-1 ring-white"
+														/>
+														<span class="hidden sm:inline text-zinc-500">{issue.assignee.name}</span>
+													</span>
+												{/if}
+												<span class="text-zinc-300">·</span>
+												<span>{issue.timeAgo}</span>
+											</span>
 										</div>
 									</div>
 
-									<div class="shrink-0">
+									<div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end sm:gap-1.5 sm:pt-0.5">
 										<span
-											class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] leading-none font-semibold {getStatusPill(
+											class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] leading-none font-semibold {getStatusPill(
 												issue.status
 											)}"
 										>
 											{issue.status}
+										</span>
+										<span
+											class="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500"
+										>
+											<span class="h-1.5 w-1.5 rounded-full {issue.state === 'open'
+												? 'bg-emerald-500'
+												: 'bg-[#8250df]'}"></span>
+											{issue.state}
 										</span>
 									</div>
 								</div>
