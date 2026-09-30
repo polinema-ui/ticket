@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { SvelteSet } from 'svelte/reactivity';
 	import { resolve } from '@/app/paths';
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import {
@@ -12,10 +11,10 @@
 		ArrowLeft01Icon,
 		GitPullRequestIcon,
 		ArrowRight01Icon,
-		CheckmarkCircle02Icon,
 	} from '@hugeicons/core-free-icons';
 	import Button from '@/lib/components/ui/button/button.svelte';
 	import Badge from '@/lib/components/ui/badge/badge.svelte';
+	import Select from '@/lib/components/ui/select/select.svelte';
 	import NewIssueModal from '@/lib/components/tickets/new-issue-modal.svelte';
 	import type { IssueItem, IssueTemplate } from '@/lib/types/ticket.js';
 
@@ -36,9 +35,6 @@
 		labels: Record<string, { name: string; color: string; colorHex?: string; count: number }[]>;
 		assignees: Record<string, { name: string; avatar: string; count: number }[]>;
 	}>({ labels: {}, assignees: {} });
-
-	let selectedIssueIds = new SvelteSet<string | number>();
-
 	onMount(async () => {
 		try {
 			const res = await fetch('/api/github-issues');
@@ -97,27 +93,6 @@
 		sortedIssues.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 	);
 
-	const toggleSelect = (id: string | number) => {
-		if (selectedIssueIds.has(id)) selectedIssueIds.delete(id);
-		else selectedIssueIds.add(id);
-	};
-
-	const getStatusPill = (status: string) => {
-		switch (status) {
-			case 'Open':
-				return 'bg-[#ecfdf5] text-[#059669] border-[#a7f3d0]';
-			case 'In Progress':
-				return 'bg-[#eff6ff] text-[#2563eb] border-[#bfdbfe]';
-			case 'Review':
-				return 'bg-[#faf5ff] text-[#7c3aed] border-[#e9d5ff]';
-			case 'Planned':
-				return 'bg-[#fffbeb] text-[#d97706] border-[#fde68a]';
-			case 'Closed':
-				return 'bg-zinc-100 text-zinc-600 border-zinc-200';
-			default:
-				return 'bg-zinc-100 text-zinc-600 border-zinc-200';
-		}
-	};
 </script>
 
 <svelte:head>
@@ -176,7 +151,7 @@
 				onclick={() => (isModalOpen = true)}
 				variant="default"
 				size="default"
-				class="gap-1.5 rounded-2xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 transition-all active:scale-95"
+				class="gap-1.5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 transition-all active:scale-95"
 			>
 				<HugeiconsIcon icon={Add01Icon} size={16} />
 				<span>New Ticket</span>
@@ -260,25 +235,24 @@
 						<span class="text-blue-500">&times;</span>
 					</button>
 				{/if}
-
-				<select
+				<Select
 					bind:value={selectedLabel}
-					class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 shadow-2xs outline-none focus:border-blue-500"
-				>
-					<option value={null}>Labels ▾</option>
-					{#each activeLabels as l (l.name)}
-						<option value={l.name}>{l.name} ({l.count})</option>
-					{/each}
-				</select>
+					options={[
+						{ label: 'Labels', value: null },
+						...activeLabels.map((l) => ({ label: `${l.name} (${l.count})`, value: l.name }))
+					]}
+					placeholder="Labels"
+				/>
 
-				<select
+				<Select
 					bind:value={selectedSort}
-					class="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 shadow-2xs outline-none focus:border-blue-500"
-				>
-					<option value="newest">Sort: Newest</option>
-					<option value="oldest">Sort: Oldest</option>
-					<option value="comments">Sort: Most Comments</option>
-				</select>
+					options={[
+						{ label: 'Sort: Newest', value: 'newest' },
+						{ label: 'Sort: Oldest', value: 'oldest' },
+						{ label: 'Sort: Most Comments', value: 'comments' }
+					]}
+					placeholder="Sort"
+				/>
 			</div>
 		</div>
 
@@ -327,10 +301,10 @@
 												>
 													<Badge
 														variant="outline"
-														class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold leading-none shadow-2xs {l.bg} {l.text} {l.border ?? 'border-transparent'}"
+														class="rounded-full border border-zinc-900 bg-white px-3 py-1 text-[11px] font-medium text-zinc-900 shadow-2xs hover:bg-zinc-50"
 													>
 														<span>{l.name}</span>
-														<HugeiconsIcon icon={ArrowRight01Icon} size={11} class="ml-1" />
+														<HugeiconsIcon icon={ArrowRight01Icon} size={11} class="ml-1 text-zinc-700" />
 													</Badge>
 												</button>
 											{/each}
