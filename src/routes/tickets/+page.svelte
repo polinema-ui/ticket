@@ -452,7 +452,7 @@
 									onclick={() => (selectedLabel = selectedLabel === lbl.name ? null : lbl.name)}
 									class="flex w-full items-center justify-between text-left transition-opacity hover:opacity-80"
 								>
-									<Badge variant="outline" class="rounded-full border-zinc-900 px-3 py-1 text-[11px] font-medium text-zinc-900 bg-white shadow-2xs">
+									<Badge variant="outline" class="rounded-full px-2.5 py-0.5 text-[11px] font-medium leading-none {lbl.color}">
 										{lbl.name}
 									</Badge>
 									<span class="text-xs font-medium text-zinc-400">{lbl.count}</span>
