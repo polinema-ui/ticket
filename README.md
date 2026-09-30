@@ -20,14 +20,14 @@ Designed as a companion to [Polinema UI](https://github.com/polinema-ui/p-ui), t
 
 ## Core Features
 
-| Feature                    | Description                                                                                                     |
-| :------------------------- | :-------------------------------------------------------------------------------------------------------------- |
+| Feature                    | Description                                                                                                      |
+| :------------------------- | :--------------------------------------------------------------------------------------------------------------- |
 | **GitHub Issue Templates** | Structured `.yml` forms for Bug Report & Component Request with unified reusable fields (email, versions, etc.). |
-| **Repo-Aware Issues Page** | Filter issues by repository (`polinema-ui/p-ui`, `polinema-ui/ticket`) — dynamic count & sidebar per repo.      |
+| **Repo-Aware Issues Page** | Filter issues by repository (`polinema-ui/p-ui`, `polinema-ui/ticket`) — dynamic count & sidebar per repo.       |
 | **Pixel-Swap Loader**      | Canvas-based pixel dissolve transition (blue → white, scale + random stagger) — zero clone overhead.             |
-| **Email Notifications**    | Collect reporter email on issue create; dispatch progress updates on PR link, assign, review, and merge/close.  |
-| **Ticketing Workflow**     | Auto-link PRs to issues, triage by `status` × `priority` × `category`, and track with labels & milestones.      |
-| **Light/Dark Ready**       | Lightmode-first (`#fbfcf8` canvas, blue `→` green selection) with dark `Html` class opt-in.                     |
+| **Email Notifications**    | Collect reporter email on issue create; dispatch progress updates on PR link, assign, review, and merge/close.   |
+| **Ticketing Workflow**     | Auto-link PRs to issues, triage by `status` × `priority` × `category`, and track with labels & milestones.       |
+| **Light/Dark Ready**       | Lightmode-first (`#fbfcf8` canvas, blue `→` green selection) with dark `Html` class opt-in.                      |
 
 ## Tech Stack
 
@@ -73,8 +73,8 @@ Execute these validation commands before committing changes:
 | `bun run format`    | Automatically formats the entire codebase.                               |
 | `bun run test:unit` | Executes unit tests via Vitest.                                          |
 | `bun run test:e2e`  | Executes end-to-end tests via Playwright.                                |
-| `bun run build`     | Creates an optimized production build.                                    |
-| `bun run preview`   | Previews the production build locally.                                    |
+| `bun run build`     | Creates an optimized production build.                                   |
+| `bun run preview`   | Previews the production build locally.                                   |
 
 ## Project Structure
 

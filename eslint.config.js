@@ -53,6 +53,10 @@ export default defineConfig(
 		rules: { 'no-restricted-imports': 'off' }
 	},
 	{
+		files: ['src/lib/server/**', 'src/routes/api/**'],
+		rules: { 'no-restricted-imports': 'off' }
+	},
+	{
 		files: [
 			'src/lib/components/hero/hero-grid.svelte',
 			'src/routes/tickets/**',

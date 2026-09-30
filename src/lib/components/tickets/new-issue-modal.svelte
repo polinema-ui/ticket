@@ -64,13 +64,24 @@
 		isOpen = false;
 	};
 
-	const handleSubmit = (e: SubmitEvent) => {
+	const handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
 		if (!title.trim() || !email.trim() || !description.trim()) return;
 
 		isSubmitting = true;
-		setTimeout(() => {
-			isSubmitting = false;
+		try {
+			const res = await fetch('/api/notify/issue', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					title: title.trim(),
+					body: description.trim(),
+					reporterEmail: email.trim(),
+					repo: activeRepo,
+					author: 'web-visitor'
+				})
+			});
+			if (!res.ok) throw new Error('Notify failed');
 			isSuccess = true;
 			setTimeout(() => {
 				isSuccess = false;
@@ -79,8 +90,13 @@
 				title = '';
 				email = '';
 				description = '';
+				label = 'bug';
 			}, 1400);
-		}, 600);
+		} catch {
+			isSuccess = false;
+		} finally {
+			isSubmitting = false;
+		}
 	};
 
 	const close = () => {
