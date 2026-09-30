@@ -1,0 +1,73 @@
+name: Component request
+description: Request a new feature / component for the Polinema Ticket app
+title: "[Request]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Want something the Ticket app doesn't have yet? Tell us what and why.
+        For Polinema UI design system components, please open the request in [p-ui](https://github.com/polinema-ui/p-ui) instead.
+
+  - type: input
+    id: feature
+    attributes:
+      label: Requested feature / component
+      description: Short name of the requested feature or component (e.g. timeline view, advanced filter, Kanban board)
+      placeholder: "timeline view for ticket history"
+    validations:
+      required: true
+
+  - type: input
+    id: email
+    attributes:
+      label: Notification email
+      description: Email to receive ticket progress notifications (assigned, triaged, merged/closed).
+      placeholder: "your-name@pui.com"
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Use case / motivation
+      description: What are you trying to accomplish? Why is this needed in the ticketing workflow?
+      placeholder: "Need a timeline to see when a ticket moved from open → review → merged…"
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Proposed behavior / API
+      description: Any ideas on behavior, filters, or props? Leave blank if not sure
+      placeholder: |
+        - Should filter by assignee / milestone
+        - Should send email on status change
+        - Prior art: …
+      render: text
+    validations:
+      required: false
+
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Would you like to contribute this?
+      description: Are you willing to open a PR for it?
+      multiple: false
+      options:
+        - "No, just requesting"
+        - "Yes, I'd like to work on it"
+        - "Yes, I already have a draft / WIP"
+      default: 0
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Links, screenshots, or anything else
+      render: text
+    validations:
+      required: false
