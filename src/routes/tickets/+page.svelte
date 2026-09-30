@@ -176,7 +176,7 @@
 				onclick={() => (isModalOpen = true)}
 				variant="default"
 				size="default"
-				class="gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-700"
+				class="gap-1.5 rounded-2xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 transition-all active:scale-95"
 			>
 				<HugeiconsIcon icon={Add01Icon} size={16} />
 				<span>New Ticket</span>
