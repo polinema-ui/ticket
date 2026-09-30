@@ -133,10 +133,10 @@ export const POST: RequestHandler = async ({ request }) => {
 					repo: repoName,
 					author: authorLogin || senderLogin,
 					htmlUrl,
-					badge: `ISSUE ${action.toUpperCase()}`
+					badge: `ISSUE ${action.toUpperCase()}`,
+					issueNumber: number
 				})
 			);
-			// requester juga dapat notif close/reopen (status berubah)
 			if ((action === 'closed' || action === 'reopened') && reporterEmail) {
 				await safe(() =>
 					notifyRequester({
