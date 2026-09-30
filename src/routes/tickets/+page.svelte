@@ -362,7 +362,7 @@
 													<span class="font-medium text-zinc-600">{issue.author.name}</span>
 												</span>
 												{#if issue.assignee}
-													<span class="text-zinc-300">→</span>
+													<HugeiconsIcon icon={ArrowRight01Icon} size={11} class="text-zinc-400" />
 													<span class="inline-flex items-center gap-1">
 														<img
 															src={issue.assignee.avatar}
@@ -451,7 +451,7 @@
 									onclick={() => (selectedLabel = selectedLabel === lbl.name ? null : lbl.name)}
 									class="flex w-full items-center justify-between text-left transition-opacity hover:opacity-80"
 								>
-									<span class="rounded-full px-2 py-0.5 text-[11px] font-semibold {lbl.color}">
+									<span class="rounded-full border px-2.5 py-0.5 text-[11px] font-medium leading-none {lbl.color}">
 										{lbl.name}
 									</span>
 									<span class="text-xs font-medium text-zinc-400">{lbl.count}</span>
