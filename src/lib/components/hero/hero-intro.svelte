@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '@/app/paths';
 	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import TechText from '@/lib/components/atoms/tech-text.svelte';
 	import { Ticket02Icon, GitPullRequestIcon } from '@hugeicons/core-free-icons';
@@ -57,11 +58,12 @@
 		</p>
 
 		<div class="mt-4 flex flex-col items-center justify-center gap-2.5 sm:mt-5 sm:flex-row">
-			<Button variant="default" size="default" class="w-full sm:w-auto">
+			<Button href={resolve('/tickets')} variant="default" size="default" class="w-full sm:w-auto">
 				<HugeiconsIcon icon={GitPullRequestIcon} size={16} />
 				Buat Ticket
 			</Button>
 			<Button
+				href={resolve('/tickets')}
 				size="default"
 				class="w-full border-gray-100 bg-white text-black shadow-none hover:bg-gray-100 sm:w-auto"
 			>

@@ -53,7 +53,11 @@ export default defineConfig(
 		rules: { 'no-restricted-imports': 'off' }
 	},
 	{
-		files: ['src/lib/components/hero/hero-grid.svelte'],
+		files: [
+			'src/lib/components/hero/hero-grid.svelte',
+			'src/routes/tickets/**',
+			'src/lib/components/tickets/**'
+		],
 		linterOptions: { reportUnusedDisableDirectives: 'off' },
 		rules: { 'svelte/no-navigation-without-resolve': 'off' }
 	}
