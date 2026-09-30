@@ -6,6 +6,39 @@ import { DEFAULT_TEMPLATES } from '@/lib/data/issue-templates.js';
 let cache: { data: unknown; ts: number } | null = null;
 const TTL = 3 * 60 * 1000;
 
+const toPreview = (body: string): string => {
+	if (!body) return '';
+	let s = body.replace(/```[\s\S]*?```/g, ' ');
+	s = s.replace(/###\s*Notification email[\s\S]*?(?=\n###\s|$)/gi, ' ');
+
+	const preferred = s.match(/###\s*(?:Use case \/ motivation|Describe the bug|Issue Description)\s*\n+([\s\S]*?)(?=\n###\s|$)/i);
+	if (preferred) {
+		s = preferred[1];
+	} else {
+		s = s.replace(/###\s*([^\n]+)\n+/g, (_, h: string) => {
+			const label = h.trim().toLowerCase();
+			if (/notification email|additional context|would you like to contribute/i.test(label)) return '';
+			return '';
+		});
+	}
+	s = s.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+	s = s.replace(/`([^`]+)`/g, '$1');
+	s = s.replace(/\s+/g, ' ').trim();
+	if (s.length > 160) s = s.slice(0, 157).trimEnd() + '…';
+
+	if (!s || s.length < 12) {
+		const fallback = body
+			.replace(/```[\s\S]*?```/g, ' ')
+			.replace(/###\s*Notification email[\s\S]*?(?=\n###\s|$)/gi, ' ')
+			.replace(/###\s*[^\n]+\n+/g, '')
+			.replace(/\s+/g, ' ')
+			.trim();
+		s = fallback.slice(0, 160).trim();
+		if (s.length === 160) s += '…';
+	}
+	return s;
+};
+
 export const GET: RequestHandler = async ({ fetch }) => {
 	if (cache && Date.now() - cache.ts < TTL) {
 		return json(cache.data, { headers: { 'cache-control': 'public, max-age=60' } });
@@ -73,7 +106,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 							id: item.id,
 							number: item.number,
 							title: item.title,
-							description: item.body ? item.body.slice(0, 140) : '',
+							description: toPreview(item.body || ''),
 							state: item.state === 'closed' ? 'closed' : 'open',
 							status:
 								item.state === 'closed' ? 'Closed' : item.pull_request ? 'In Progress' : 'Open',
