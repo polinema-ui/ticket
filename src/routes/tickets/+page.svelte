@@ -293,24 +293,6 @@
 					{:else}
 						{#each paginatedIssues as issue (issue.id)}
 								<div class="group flex items-center gap-3.5 p-4 transition-colors hover:bg-zinc-50/70">
-									<div class="shrink-0">
-										{#if issue.state === 'open'}
-											<span
-												class="flex h-6 w-6 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-600"
-												title="Open"
-											>
-												<span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-											</span>
-										{:else}
-											<span
-												class="flex h-6 w-6 items-center justify-center rounded-full bg-[#8250df] text-white"
-												title="Closed"
-											>
-												<HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} />
-											</span>
-										{/if}
-									</div>
-
 									<div class="min-w-0 flex-1">
 										<div class="flex flex-wrap items-center gap-1.5">
 											<a
@@ -341,10 +323,15 @@
 												<button
 													type="button"
 													onclick={() => (selectedLabel = l.name)}
-													class="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium leading-none {l.bg} {l.text} {l.border ?? 'border-zinc-200'} hover:opacity-80"
+													class="transition-opacity hover:opacity-80"
 												>
-													<span>{l.name}</span>
-													<HugeiconsIcon icon={ArrowRight01Icon} size={12} />
+													<Badge
+														variant="outline"
+														class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold leading-none shadow-2xs {l.bg} {l.text} {l.border ?? 'border-transparent'}"
+													>
+														<span>{l.name}</span>
+														<HugeiconsIcon icon={ArrowRight01Icon} size={11} class="ml-1" />
+													</Badge>
 												</button>
 											{/each}
 
