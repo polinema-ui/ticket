@@ -139,7 +139,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			);
 			if ((action === 'opened' || action === 'closed' || action === 'reopened') && reporterEmail) {
 				const isOpened = action === 'opened';
-				const statusText = isOpened ? 'Received' : action === 'closed' ? 'Closed' : 'Reopened';
+				const statusText = isOpened ? 'Opened' : action === 'closed' ? 'Closed' : 'Reopened';
 				const metaText = isOpened
 					? `<p style="margin:0"><strong>Status:</strong> Diterima dan menunggu review tim (dilaporkan oleh ${senderLogin})</p>`
 					: `<p style="margin:0"><strong>Status:</strong> ${action} oleh ${senderLogin}</p>`;
@@ -149,7 +149,7 @@ export const POST: RequestHandler = async ({ request }) => {
 						to: reporterEmail,
 						subject: `[${statusText}] ${title} · ${repoName}#${number ?? ''}`,
 						heading: title || `Issue #${number ?? ''}`,
-						badge: isOpened ? 'RECEIVED' : action.toUpperCase(),
+						badge: isOpened ? 'OPENED' : action.toUpperCase(),
 						repo: repoName,
 						meta: metaText,
 						body: body,
