@@ -137,15 +137,21 @@ export const POST: RequestHandler = async ({ request }) => {
 					issueNumber: number
 				})
 			);
-			if ((action === 'closed' || action === 'reopened') && reporterEmail) {
+			if ((action === 'opened' || action === 'closed' || action === 'reopened') && reporterEmail) {
+				const isOpened = action === 'opened';
+				const statusText = isOpened ? 'Received' : action === 'closed' ? 'Closed' : 'Reopened';
+				const metaText = isOpened
+					? `<p style="margin:0"><strong>Status:</strong> Diterima dan menunggu review tim (dilaporkan oleh ${senderLogin})</p>`
+					: `<p style="margin:0"><strong>Status:</strong> ${action} oleh ${senderLogin}</p>`;
+
 				await safe(() =>
 					notifyRequester({
 						to: reporterEmail,
-						subject: `[${action === 'closed' ? 'Closed' : 'Reopened'}] ${title} · ${repoName}#${number ?? ''}`,
+						subject: `[${statusText}] ${title} · ${repoName}#${number ?? ''}`,
 						heading: title || `Issue #${number ?? ''}`,
-						badge: action.toUpperCase(),
+						badge: isOpened ? 'RECEIVED' : action.toUpperCase(),
 						repo: repoName,
-						meta: `<p style="margin:0"><strong>Status:</strong> ${action} oleh ${senderLogin}</p>`,
+						meta: metaText,
 						body: body,
 						htmlUrl
 					})
