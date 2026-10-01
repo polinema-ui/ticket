@@ -10,6 +10,8 @@
 	import NewIssueModal from '@/lib/components/tickets/new-issue-modal.svelte';
 	import TicketCard from '@/lib/components/tickets/ticket-card.svelte';
 	import TicketSidebar from '@/lib/components/tickets/ticket-sidebar.svelte';
+	import TicketSkeleton from '@/lib/components/tickets/ticket-skeleton.svelte';
+	import SidebarSkeleton from '@/lib/components/tickets/sidebar-skeleton.svelte';
 	import TicketPagination from '@/lib/components/tickets/ticket-pagination.svelte';
 	import TicketFilters from '@/lib/components/tickets/ticket-filters.svelte';
 	import type { IssueItem, IssueTemplate } from '@/lib/types/ticket.js';
@@ -22,8 +24,6 @@
 	let currentPage = $state(1);
 	const pageSize = 10;
 
-	let isModalOpen = $state(false);
-
 	let issues = $state<IssueItem[]>([]);
 	let templates = $state<IssueTemplate[]>([]);
 	let repos = $state<{ name: string; html_url: string; open_issues_count: number }[]>([]);
@@ -31,7 +31,13 @@
 		labels: Record<string, { name: string; color: string; colorHex?: string; count: number }[]>;
 		assignees: Record<string, { name: string; avatar: string; count: number }[]>;
 	}>({ labels: {}, assignees: {} });
-	onMount(async () => {
+
+	let isModalOpen = $state(false);
+
+	let isLoading = $state(true);
+	let isBackgroundFetching = $state(false);
+
+	const fetchIssues = async () => {
 		try {
 			const res = await fetch('/api/github-issues');
 			if (res.ok) {
@@ -44,6 +50,20 @@
 		} catch {
 			void 0;
 		}
+	};
+
+	onMount(() => {
+		fetchIssues().finally(() => {
+			isLoading = false;
+		});
+
+		const interval = setInterval(async () => {
+			isBackgroundFetching = true;
+			await fetchIssues();
+			isBackgroundFetching = false;
+		}, 30000); // Polling every 30 seconds
+
+		return () => clearInterval(interval);
 	});
 
 	let repoIssues = $derived(issues.filter((i) => !selectedRepo || i.repo === selectedRepo));
@@ -150,7 +170,13 @@
 		<div class="mt-6 grid grid-cols-1 items-start gap-8 lg:grid-cols-4">
 			<div class="lg:col-span-3">
 				<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xs">
-					{#if paginatedIssues.length === 0}
+					{#if isLoading}
+						{#each Array(5) as _}
+							<div class="border-b border-zinc-100 last:border-0">
+								<TicketSkeleton />
+							</div>
+						{/each}
+					{:else if paginatedIssues.length === 0}
 						<div class="p-12 text-center">
 							<p class="text-sm font-semibold text-zinc-700">No issues found</p>
 							<p class="mt-1 text-xs text-zinc-400">Try adjusting your filters or search query.</p>
@@ -165,7 +191,11 @@
 				<TicketPagination bind:currentPage {pageSize} totalItems={sortedIssues.length} />
 			</div>
 
-			<TicketSidebar {activeLabels} {activeAssignees} {selectedRepo} bind:selectedLabel />
+			{#if isLoading}
+				<SidebarSkeleton />
+			{:else}
+				<TicketSidebar {activeLabels} {activeAssignees} {selectedRepo} bind:selectedLabel />
+			{/if}
 		</div>
 	</div>
 </div>
