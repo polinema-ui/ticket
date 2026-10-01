@@ -132,12 +132,12 @@ const renderSections = (body: string): string => {
 
 const badgeStyle = (badge: string): string => {
 	const b = badge.toLowerCase();
-	if (b.includes('assigned')) return 'background:#18181b;color:#fff;border:1px solid #18181b';
-	if (b.includes('merged')) return 'background:#dcfce7;color:#166534;border:1px solid #bbf7d0';
-	if (b.includes('closed')) return 'background:#fee2e2;color:#991b1b;border:1px solid #fecaca';
-	if (b.includes('comment')) return 'background:#ffedd5;color:#9a3412;border:1px solid #fed7aa';
-	if (b.includes('opened')) return 'background:#eff6ff;color:#1d4ed8;border:1px solid #dbeafe';
-	return 'background:#f4f4f5;color:#27272a;border:1px solid #e4e4e7';
+	if (b.includes('assigned')) return 'background:#f59e0b;color:#ffffff;border:1px solid #f59e0b';
+	if (b.includes('merged')) return 'background:#16a34a;color:#ffffff;border:1px solid #16a34a';
+	if (b.includes('closed')) return 'background:#dc2626;color:#ffffff;border:1px solid #dc2626';
+	if (b.includes('comment')) return 'background:#8b5cf6;color:#ffffff;border:1px solid #8b5cf6';
+	if (b.includes('opened') || b.includes('received')) return 'background:#0066FF;color:#ffffff;border:1px solid #0066FF';
+	return 'background:#52525b;color:#ffffff;border:1px solid #52525b';
 };
 
 const baseTemplate = (opts: {
@@ -152,10 +152,10 @@ const baseTemplate = (opts: {
 	ctaLabel?: string;
 }): string => {
 	const badgeHtml = opts.badge
-		? `<span style="display:inline-block;padding:2px 9px;border-radius:9999px;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:10px;font-weight:700;letter-spacing:.06em;${badgeStyle(opts.badge)}">${esc(opts.badge)}</span>`
+		? `<span style="display:inline-block;padding:4px 12px;border-radius:9999px;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:10px;font-weight:700;letter-spacing:.05em;${badgeStyle(opts.badge)}">${esc(opts.badge)}</span>`
 		: '';
-	const repoPill = `<span style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:11px;color:#71717a">polinema-ui/${esc(opts.repo)}${opts.issueNumber ? ` · #${opts.issueNumber}` : ''}</span>`;
 	const safeTitle = esc(opts.title).replace(/"/g, '&quot;');
+	const dateString = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
 	return `<!doctype html>
 <html>
@@ -164,53 +164,82 @@ const baseTemplate = (opts: {
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
 </head>
-<body style="margin:0;padding:0;background:#f8fafc">
-<div style="background:#f4f4f5;padding:28px 16px">
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td align="center">
-	<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px;max-width:100%">
-		<tr><td align="center" style="padding:8px 0 18px">
-			<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-				<td style="width:28px;height:28px;background:#18181b;border-radius:8px;text-align:center;vertical-align:middle">
-					<span style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-weight:800;font-size:13px;color:#fff;line-height:28px;display:block">P</span>
-				</td>
-				<td style="padding-left:8px;vertical-align:middle">
-					<span style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:13px;letter-spacing:-.02em;color:#18181b">Polinema Ticket</span>
-					<span style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:11px;color:#71717a"> · p-ui</span>
-				</td>
-			</tr></table>
-		</td></tr>
-		<tr><td>
-			<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:16px;overflow:hidden">
-				<tr><td style="height:3px;line-height:3px;background:#18181b;font-size:0">&nbsp;</td></tr>
-				<tr><td style="padding:22px 22px 10px 22px">
-					<div style="margin:0 0 10px">${badgeHtml} <span style="margin-left:6px">${repoPill}</span></div>
-					<h1 style="margin:0;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:17px;line-height:1.35;font-weight:700;color:#18181b;letter-spacing:-.02em">${safeTitle}</h1>
-					<div style="margin:7px 0 0;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:11px;line-height:1.5;color:#71717a">${opts.metaLine}</div>
-				</td></tr>
-				<tr><td style="padding:8px 16px 16px 16px">
-					<div style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;overflow:hidden">
-						${renderSections(opts.body)}
-					</div>
-					${
-						opts.htmlUrl
-							? `<div style="text-align:center;padding:18px 0 4px">
-								<a href="${esc(opts.htmlUrl)}" style="display:inline-block;padding:11px 22px;background:#18181b;color:#ffffff;border-radius:9999px;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:-.01em">${esc(opts.ctaLabel || 'View on GitHub →')}</a>
-							</div>
-							<div style="text-align:center;padding-top:8px">
-								<a href="${esc(opts.htmlUrl)}" style="font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:11px;color:#2563eb;word-break:break-all;text-decoration:none">${esc(opts.htmlUrl)}</a>
-							</div>`
-							: ''
-					}
-				</td></tr>
-			</table>
-		</td></tr>
-		<tr><td align="center" style="padding:14px 10px 6px">
-			<p style="margin:0;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:11px;line-height:1.5;color:#a1a1aa">${esc(opts.footerNote || 'You are receiving this because you are subscribed to Polinema UI notifications. Reply to this email to leave a comment on GitHub.')}</p>
-			<p style="margin:6px 0 0;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;font-size:11px;color:#a1a1aa">Polinema Ticket · <a href="https://ticket.p-ui.deno.net" style="color:#71717a;text-decoration:underline">ticket.p-ui.deno.net</a> · polinema.ui@gmail.com</p>
-		</td></tr>
-	</table>
-</td></tr></table>
-</div>
+<body style="margin:0;padding:0;background:#f4f5f7;font-family:'Plus Jakarta Sans',ui-sans-serif,system-ui,sans-serif;">
+
+<!-- Header -->
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0066FF;">
+<tr><td align="center">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px;max-width:100%;padding:16px 20px;">
+        <tr>
+            <td align="left" style="color:#ffffff;font-size:15px;font-weight:700;letter-spacing:-0.02em;">
+                <span style="display:inline-block;background:#ffffff;border-radius:6px;width:24px;height:24px;line-height:24px;text-align:center;color:#0066FF;margin-right:8px;vertical-align:middle;font-size:14px;">🎫</span>
+                <span style="vertical-align:middle;">Polinema Ticket</span>
+            </td>
+            <td align="right" style="color:#e0e7ff;font-size:11px;font-weight:600;">
+                ${dateString}
+            </td>
+        </tr>
+    </table>
+</td></tr>
+</table>
+
+<!-- Main Content -->
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr><td align="center" style="padding:32px 16px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px;max-width:100%;">
+        
+        <!-- Hero Card -->
+        <tr><td style="background:#eef5ff;border:1px solid #dbeafe;border-radius:16px;padding:32px 24px;text-align:center;">
+            <div style="width:40px;height:40px;background:#ffffff;border-radius:12px;display:inline-block;line-height:40px;font-size:20px;margin-bottom:16px;box-shadow:0 2px 4px rgba(0,0,0,0.05)">🎫</div>
+            <h1 style="margin:0;font-size:20px;font-weight:700;color:#18181b;line-height:1.4;letter-spacing:-0.02em;">${safeTitle}</h1>
+            <div style="margin:12px 0 0;font-size:13px;color:#4b5563;">${opts.metaLine}</div>
+        </td></tr>
+
+        <!-- Actions Row -->
+        <tr><td style="padding:16px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                    <td width="48%" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;padding:14px;text-align:center;font-size:12px;color:#18181b;font-weight:600;">
+                        <span style="color:#71717a">Repo ID:</span> <span style="color:#0066FF">${esc(opts.repo)}${opts.issueNumber ? ` · #${opts.issueNumber}` : ''}</span>
+                    </td>
+                    <td width="4%"></td>
+                    <td width="48%" style="background:#0066FF;border-radius:12px;padding:14px;text-align:center;">
+                        <a href="${esc(opts.htmlUrl || '#')}" style="color:#ffffff;font-size:13px;font-weight:700;text-decoration:none;display:block;">${esc(opts.ctaLabel || 'View Issue')}</a>
+                    </td>
+                </tr>
+            </table>
+        </td></tr>
+
+        <!-- Details Card -->
+        <tr><td style="background:#ffffff;border:1px solid #e4e4e7;border-radius:16px;overflow:hidden;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                    <td style="padding:16px 20px;border-bottom:1px solid #f4f4f5;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                            <tr>
+                                <td align="left" style="font-size:14px;font-weight:700;color:#18181b;">Ticket Details</td>
+                                <td align="right">${badgeHtml}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:20px;">
+                        ${renderSections(opts.body)}
+                    </td>
+                </tr>
+            </table>
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td align="center" style="padding:32px 0 0;">
+            <p style="margin:0;font-size:11px;color:#a1a1aa;line-height:1.5;">${esc(opts.footerNote || 'This issue has been closed.')}</p>
+            <p style="margin:8px 0 0;font-size:11px;color:#a1a1aa;">Polinema Ticket · <a href="https://ticket.p-ui.deno.net" style="color:#0066FF;text-decoration:none;">ticket.p-ui.deno.net</a> · <a href="mailto:polinema.ui@gmail.com" style="color:#0066FF;text-decoration:none;">polinema.ui@gmail.com</a></p>
+        </td></tr>
+        
+    </table>
+</td></tr>
+</table>
 </body>
 </html>`;
 };
