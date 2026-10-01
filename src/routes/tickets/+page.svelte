@@ -32,7 +32,6 @@
 	let isModalOpen = $state(false);
 
 	let isLoading = $state(true);
-	let isBackgroundFetching = $state(false);
 
 	const fetchIssues = async () => {
 		try {
@@ -55,10 +54,8 @@
 		});
 
 		const interval = setInterval(async () => {
-			isBackgroundFetching = true;
 			await fetchIssues();
-			isBackgroundFetching = false;
-		}, 30000); // Polling every 30 seconds
+		}, 30000); 
 
 		return () => clearInterval(interval);
 	});
@@ -167,7 +164,7 @@
 			<div class="lg:col-span-3">
 				<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xs">
 					{#if isLoading}
-						{#each Array(5) as _}
+						{#each Array(5) as _, i (i)}
 							<div class="border-b border-zinc-100 last:border-0">
 								<TicketSkeleton />
 							</div>

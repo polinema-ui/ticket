@@ -52,6 +52,6 @@
 		"clsx": "^2.1.1",
 		"nodemailer": "^10.0.13",
 		"tailwind-merge": "^3.7.0",
-		"zod": "^4.6.5"
+		"zod": "3"
 	}
 }

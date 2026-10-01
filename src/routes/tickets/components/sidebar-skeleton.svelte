@@ -5,7 +5,7 @@
 			<div class="h-3 w-16 rounded bg-zinc-200"></div>
 		</div>
 		<div class="mt-4 space-y-3">
-			{#each Array(5) as _}
+			{#each Array(5) as _, i (i)}
 				<div class="flex items-center justify-between">
 					<div class="h-6 w-24 rounded-full bg-zinc-100"></div>
 					<div class="h-3 w-4 rounded bg-zinc-100"></div>
@@ -20,7 +20,7 @@
 			<div class="h-3 w-20 rounded bg-zinc-200"></div>
 		</div>
 		<div class="mt-4 space-y-3">
-			{#each Array(3) as _}
+			{#each Array(3) as _, i (i)}
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-2">
 						<div class="h-5 w-5 rounded-full bg-zinc-200"></div>
