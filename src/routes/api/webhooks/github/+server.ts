@@ -141,7 +141,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				const isOpened = action === 'opened';
 				const statusText = isOpened ? 'Opened' : action === 'closed' ? 'Closed' : 'Reopened';
 				const metaText = isOpened
-					? `<p style="margin:0"><strong>Status:</strong> Diterima dan menunggu review tim (dilaporkan oleh ${senderLogin})</p>`
+					? `<p style="margin:0"><strong>Status:</strong> Diterima dan menunggu review tim @polinema/ui</p>`
 					: `<p style="margin:0"><strong>Status:</strong> ${action} oleh ${senderLogin}</p>`;
 
 				await safe(() =>

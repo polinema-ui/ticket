@@ -172,7 +172,7 @@ const baseTemplate = (opts: {
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px;max-width:100%;padding:16px 20px;">
         <tr>
             <td align="left" style="color:#ffffff;font-size:15px;font-weight:700;letter-spacing:-0.02em;">
-                <span style="display:inline-block;background:#ffffff;border-radius:6px;width:24px;height:24px;line-height:24px;text-align:center;color:#0066FF;margin-right:8px;vertical-align:middle;font-size:14px;">🎫</span>
+                <img src="https://ticket.p-ui.deno.net/logo.png" width="24" height="24" style="display:inline-block;border-radius:6px;margin-right:8px;vertical-align:middle;border:0;background:#ffffff;" alt="Logo" />
                 <span style="vertical-align:middle;">Polinema Ticket</span>
             </td>
             <td align="right" style="color:#e0e7ff;font-size:11px;font-weight:600;">
@@ -190,7 +190,7 @@ const baseTemplate = (opts: {
         
         <!-- Hero Card -->
         <tr><td style="background:#eef5ff;border:1px solid #dbeafe;border-radius:16px;padding:32px 24px;text-align:center;">
-            <div style="width:40px;height:40px;background:#ffffff;border-radius:12px;display:inline-block;line-height:40px;font-size:20px;margin-bottom:16px;box-shadow:0 2px 4px rgba(0,0,0,0.05)">🎫</div>
+            <div style="width:40px;height:40px;margin:0 auto 16px;background:#ffffff;border-radius:12px;box-shadow:0 2px 4px rgba(0,0,0,0.05);overflow:hidden;"><img src="https://ticket.p-ui.deno.net/logo.png" width="40" height="40" style="display:block;border:0;" alt="Logo" /></div>
             <h1 style="margin:0;font-size:20px;font-weight:700;color:#18181b;line-height:1.4;letter-spacing:-0.02em;">${safeTitle}</h1>
             <div style="margin:12px 0 0;font-size:13px;color:#4b5563;">${opts.metaLine}</div>
         </td></tr>
