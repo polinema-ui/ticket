@@ -5,6 +5,7 @@ export type IssueLabel = {
 	bg: string;
 	text: string;
 	border?: string;
+	colorHex?: string;
 };
 
 export type IssueItem = {

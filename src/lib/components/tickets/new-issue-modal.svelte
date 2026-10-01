@@ -107,7 +107,7 @@
 </script>
 
 {#if isOpen}
-	<div class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+	<div class="fixed inset-0 z-9999 flex items-center justify-center p-4">
 		<button
 			type="button"
 			class="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity"

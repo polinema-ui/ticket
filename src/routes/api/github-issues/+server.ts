@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import type { IssueItem } from '@/lib/types/ticket.js';
 import { DEFAULT_TEMPLATES } from '@/lib/data/issue-templates.js';
-
+import { env } from '$env/dynamic/private';
 let cache: { data: unknown; ts: number } | null = null;
 const TTL = 3 * 60 * 1000;
 
@@ -21,10 +21,9 @@ const toPreview = (body: string): string => {
 			return '';
 		});
 	}
-	s = s.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
 	s = s.replace(/`([^`]+)`/g, '$1');
+	s = s.replace(/`/g, '');
 	s = s.replace(/\s+/g, ' ').trim();
-	if (s.length > 160) s = s.slice(0, 157).trimEnd() + '…';
 
 	if (!s || s.length < 12) {
 		const fallback = body
@@ -49,11 +48,18 @@ export const GET: RequestHandler = async ({ fetch }) => {
 	const repoLabels: Record<string, { name: string; color: string; count: number }[]> = {};
 	const repoAssignees: Record<string, { name: string; avatar: string; count: number }[]> = {};
 
+	const ghHeaders: Record<string, string> = {
+		Accept: 'application/vnd.github+json',
+		'User-Agent': 'polinema-ticket'
+	};
+	if (env.GITHUB_TOKEN) {
+		ghHeaders.Authorization = `Bearer ${env.GITHUB_TOKEN}`;
+	}
+
 	try {
 		const reposRes = await fetch('https://api.github.com/orgs/polinema-ui/repos', {
-			headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'polinema-ticket' }
+			headers: ghHeaders
 		});
-
 		if (reposRes.ok) {
 			const repoData = await reposRes.json();
 			if (Array.isArray(repoData)) {
@@ -93,9 +99,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		try {
 			const issuesRes = await fetch(
 				`https://api.github.com/repos/polinema-ui/${repo.name}/issues?state=all&per_page=50`,
-				{
-					headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'polinema-ticket' }
-				}
+				{ headers: ghHeaders }
 			);
 
 			if (issuesRes.ok) {
@@ -115,9 +119,10 @@ export const GET: RequestHandler = async ({ fetch }) => {
 										name: l.name,
 										bg: `bg-[#${l.color}15]`,
 										text: `text-[#${l.color}]`,
-										border: `border-[#${l.color}30]`
+										border: `border-[#${l.color}30]`,
+										colorHex: l.color
 									}))
-								: [{ name: 'general', bg: 'bg-zinc-100', text: 'text-zinc-700' }],
+								: [{ name: 'general', bg: 'bg-zinc-100', text: 'text-zinc-700', colorHex: '52525b' }],
 							commentsCount: item.comments || 0,
 							author: {
 								name: item.user?.login || 'contributor',
@@ -127,7 +132,8 @@ export const GET: RequestHandler = async ({ fetch }) => {
 							timeAgo: item.created_at
 								? new Date(item.created_at).toLocaleDateString('id-ID', {
 										day: 'numeric',
-										month: 'short'
+										month: 'short',
+										year: 'numeric'
 									})
 								: 'recently',
 							assignee: item.assignee
@@ -151,9 +157,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		try {
 			const labelsRes = await fetch(
 				`https://api.github.com/repos/polinema-ui/${repo.name}/labels?per_page=30`,
-				{
-					headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'polinema-ticket' }
-				}
+				{ headers: ghHeaders }
 			);
 			if (labelsRes.ok) {
 				const labelsData = await labelsRes.json();
@@ -166,6 +170,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 						).length;
 						return {
 							name: l.name,
+							colorHex: l.color,
 							color: `bg-[#${l.color}15] text-[#${l.color}] border-[#${l.color}30]`,
 							count
 						};
@@ -179,9 +184,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		try {
 			const contribRes = await fetch(
 				`https://api.github.com/repos/polinema-ui/${repo.name}/contributors?per_page=10`,
-				{
-					headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'polinema-ticket' }
-				}
+				{ headers: ghHeaders }
 			);
 			if (contribRes.ok) {
 				const contribData = await contribRes.json();
