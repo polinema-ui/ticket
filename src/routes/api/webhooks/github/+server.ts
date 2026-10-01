@@ -77,9 +77,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	const event = request.headers.get('x-github-event') || request.headers.get('X-GitHub-Event') || '';
 	const actionVal = payload.action;
-	const action = typeof actionVal === 'string' ? actionVal : '';
-
-	// ping when webhook created
+	const action = typeof actionVal === 'string' ? actionVal : '';
 	if (event === 'ping' || 'zen' in payload) {
 		return json({ ok: true, ping: true });
 	}
@@ -92,18 +90,14 @@ export const POST: RequestHandler = async ({ request }) => {
 			if (typeof v === 'string') return v;
 		}
 		return 'p-ui';
-	})();
-
-	// helper: safe fire without failing whole webhook
+	})();
 	const safe = async (fn: () => Promise<void>) => {
 		try {
 			await fn();
 		} catch (e) {
 			console.error('[webhook email failed]', e);
 		}
-	};
-
-	// ── ISSUES ──────────────────────────────────────────────
+	};
 	if (event === 'issues') {
 		const issueVal = payload.issue;
 		if (!issueVal || typeof issueVal !== 'object') return json({ ok: true, skipped: true });
@@ -114,9 +108,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const number = getNumber(issue, 'number');
 		const authorLogin = getLogin(issue.user);
 		const reporterEmail = extractReporterEmail(body);
-		const assigneeLogin = getLogin(payload.assignee) || getLogin(issue.assignee);
-
-		// 1) open/close/reopen/labeled/unlabeled → central polinema.ui@gmail.com
+		const assigneeLogin = getLogin(payload.assignee) || getLogin(issue.assignee);
 		if (['opened', 'closed', 'reopened', 'labeled', 'unlabeled'].includes(action)) {
 			const labelName = (() => {
 				const l = payload.label;
@@ -158,14 +150,10 @@ export const POST: RequestHandler = async ({ request }) => {
 				);
 			}
 			return json({ ok: true });
-		}
-
-		// 2) assigned → ke assignee (rriovld/rafiabiyyu) + central + requester
+		}
 		if (action === 'assigned' && assigneeLogin) {
 			const assigneeEmail = resolveAssigneeEmail(assigneeLogin);
-			const assignedBy = senderLogin;
-
-			// central tetap dapat
+			const assignedBy = senderLogin;
 			await safe(() =>
 				notifyCentral({
 					title: title || `Issue #${number ?? ''}`,
@@ -175,8 +163,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					htmlUrl,
 					badge: 'ISSUE ASSIGNED'
 				})
-			);
-			// ke orang yang di-assign
+			);
 			if (assigneeEmail) {
 				await safe(() =>
 					notifyAssignee({
@@ -190,8 +177,7 @@ export const POST: RequestHandler = async ({ request }) => {
 						issueNumber: number
 					})
 				);
-			}
-			// ke requester: "PR/issue kamu di-assign oleh siapa"
+			}
 			if (reporterEmail) {
 				await safe(() =>
 					notifyRequester({
@@ -214,9 +200,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		return json({ ok: true, skipped: true, reason: `issue action ${action} ignored` });
-	}
-
-	// ── PULL REQUEST ───────────────────────────────────────
+	}
 	if (event === 'pull_request') {
 		const prVal = payload.pull_request;
 		if (!prVal || typeof prVal !== 'object') return json({ ok: true, skipped: true });
@@ -241,8 +225,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					htmlUrl,
 					badge
 				})
-			);
-			// closed/merged → requester dapat notif
+			);
 			if (action === 'closed' && reporterEmail) {
 				await safe(() =>
 					notifyRequester({
@@ -304,9 +287,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		return json({ ok: true, skipped: true });
-	}
-
-	// ── ISSUE COMMENT / PR COMMENT (balasan) ───────────────
+	}
 	if (event === 'issue_comment' || event === 'pull_request_review_comment' || event === 'pull_request_review' || event === 'pull_request_review_thread') {
 		if (action !== 'created' && action !== 'submitted' && action !== 'resolved' && action !== 'unresolved') {
 			return json({ ok: true, skipped: true });
@@ -332,9 +313,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			const u = c.user;
 			const login = getLogin(u);
 			if (login) commenter = login;
-		}
-		// jangan kirim ke diri sendiri kalau yang komen = requester sendiri (optional, tapi tetap kasih central)
-		// untuk sekarang tetap kirim biar requester tau ada balasan (bisa dari maintainer)
+		}
 		await safe(() =>
 			notifyRequester({
 				to: reporterEmail,
@@ -346,8 +325,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				body: commentBody || '(no body)',
 				htmlUrl: commentUrl || issueHtmlUrl
 			})
-		);
-		// central juga dapat ringkasan comment
+		);
 		await safe(() =>
 			notifyCentral({
 				title: `Comment on ${issueTitle}`,
