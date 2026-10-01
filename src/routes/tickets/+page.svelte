@@ -121,9 +121,8 @@
 		<div class="mx-auto flex max-w-7xl items-center justify-between">
 			<Button
 				href={resolve('/')}
-				variant="outline"
 				size="sm"
-				class="gap-1.5 border-zinc-200 bg-white text-zinc-600 hover:bg-gray-200  hover:text-black"
+				class="gap-1.5 border-zinc-200 bg-white text-black hover:bg-gray-100 hover:text-black shadow-none"
 			>
 				<HugeiconsIcon icon={ArrowLeft01Icon} size={14} />
 				<span>Back to Home</span>
