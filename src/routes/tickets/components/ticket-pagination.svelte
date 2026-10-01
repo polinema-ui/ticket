@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { HugeiconsIcon } from '@hugeicons/svelte';
 	import { ArrowLeft01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
+	import { HugeiconsIcon } from '@hugeicons/svelte';
 
 	let {
 		currentPage = $bindable(1),

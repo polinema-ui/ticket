@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { HugeiconsIcon } from '@hugeicons/svelte';
-	import { Tag01Icon, User02Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
 	import Badge from '@/lib/components/ui/badge/badge.svelte';
+	import { ArrowRight01Icon, Tag01Icon, User02Icon } from '@hugeicons/core-free-icons';
+	import { HugeiconsIcon } from '@hugeicons/svelte';
 
 	let {
 		activeLabels,

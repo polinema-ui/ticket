@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { HugeiconsIcon } from '@hugeicons/svelte';
-	import { Add01Icon, Search01Icon } from '@hugeicons/core-free-icons';
 	import Button from '@/lib/components/ui/button/button.svelte';
 	import Select from '@/lib/components/ui/select/select.svelte';
+	import { Add01Icon, Search01Icon } from '@hugeicons/core-free-icons';
+	import { HugeiconsIcon } from '@hugeicons/svelte';
 
 	let {
 		isModalOpen = $bindable(false),

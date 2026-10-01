@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { IssueItem } from '@/lib/types/ticket.js';
-	import { HugeiconsIcon } from '@hugeicons/svelte';
-	import { Comment01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
 	import Badge from '@/lib/components/ui/badge/badge.svelte';
+	import type { IssueItem } from '@/lib/types/ticket.js';
+	import { ArrowRight01Icon, Comment01Icon } from '@hugeicons/core-free-icons';
+	import { HugeiconsIcon } from '@hugeicons/svelte';
 
 	let {
 		issue,

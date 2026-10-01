@@ -1,12 +1,48 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
+import { z } from 'zod';
 import {
 	notifyCentral,
 	notifyAssignee,
 	notifyRequester,
 	resolveAssigneeEmail
 } from '@/lib/server/email.js';
+
+const githubWebhookSchema = z.object({
+	action: z.string().optional(),
+	zen: z.string().optional(),
+	sender: z.object({ login: z.string().optional() }).passthrough().optional(),
+	repository: z.object({ name: z.string().optional() }).passthrough().optional(),
+	assignee: z.object({ login: z.string().optional() }).passthrough().optional(),
+	label: z.object({ name: z.string().optional() }).passthrough().optional(),
+	issue: z.object({
+		title: z.string().optional(),
+		body: z.string().nullable().optional(),
+		html_url: z.string().optional(),
+		number: z.number().optional(),
+		user: z.object({ login: z.string().optional() }).passthrough().optional(),
+		assignee: z.object({ login: z.string().optional() }).passthrough().nullable().optional()
+	}).passthrough().optional(),
+	pull_request: z.object({
+		title: z.string().optional(),
+		body: z.string().nullable().optional(),
+		html_url: z.string().optional(),
+		number: z.number().optional(),
+		user: z.object({ login: z.string().optional() }).passthrough().optional(),
+		merged: z.boolean().optional()
+	}).passthrough().optional(),
+	comment: z.object({
+		body: z.string().optional(),
+		html_url: z.string().optional(),
+		user: z.object({ login: z.string().optional() }).passthrough().optional()
+	}).passthrough().optional(),
+	review: z.object({
+		body: z.string().optional(),
+		html_url: z.string().optional(),
+		user: z.object({ login: z.string().optional() }).passthrough().optional()
+	}).passthrough().optional()
+}).passthrough();
 
 const extractReporterEmail = (body: string): string | null => {
 	let email: string | null = null;
@@ -43,22 +79,6 @@ const verifySignature = async (
 	return signature === hex;
 };
 
-const getString = (obj: Record<string, unknown>, key: string): string | undefined => {
-	const v = obj[key];
-	return typeof v === 'string' ? v : undefined;
-};
-
-const getNumber = (obj: Record<string, unknown>, key: string): number | undefined => {
-	const v = obj[key];
-	return typeof v === 'number' ? v : undefined;
-};
-
-const getLogin = (obj: unknown): string | undefined => {
-	if (!obj || typeof obj !== 'object' || !('login' in obj)) return undefined;
-	const v = (obj as Record<string, unknown>).login;
-	return typeof v === 'string' ? v : undefined;
-};
-
 export const POST: RequestHandler = async ({ request }) => {
 	const raw = await request.text();
 	const secret = env.GITHUB_WEBHOOK_SECRET || '';
@@ -68,56 +88,46 @@ export const POST: RequestHandler = async ({ request }) => {
 		if (!ok) return json({ error: 'Invalid signature' }, { status: 401 });
 	}
 
-	let payload: Record<string, unknown>;
+	let payload: z.infer<typeof githubWebhookSchema>;
 	try {
-		payload = JSON.parse(raw) as Record<string, unknown>;
-	} catch {
-		return json({ error: 'Invalid JSON' }, { status: 400 });
+		payload = githubWebhookSchema.parse(JSON.parse(raw));
+	} catch (err) {
+		console.error('[webhook] Zod validation failed:', err);
+		return json({ error: 'Invalid JSON or schema' }, { status: 400 });
 	}
 
 	const event = request.headers.get('x-github-event') || request.headers.get('X-GitHub-Event') || '';
-	const actionVal = payload.action;
-	const action = typeof actionVal === 'string' ? actionVal : '';
-	if (event === 'ping' || 'zen' in payload) {
+	const action = payload.action || '';
+
+	if (event === 'ping' || payload.zen !== undefined) {
 		return json({ ok: true, ping: true });
 	}
 
-	const senderLogin = getLogin(payload.sender) || 'github';
-	const repoName = (() => {
-		const r = payload.repository;
-		if (r && typeof r === 'object' && 'name' in r) {
-			const v = (r as Record<string, unknown>).name;
-			if (typeof v === 'string') return v;
-		}
-		return 'p-ui';
-	})();
+	const senderLogin = payload.sender?.login || 'github';
+	const repoName = payload.repository?.name || 'p-ui';
+
 	const safe = async (fn: () => Promise<void>) => {
 		try {
 			await fn();
 		} catch (e) {
 			console.error('[webhook email failed]', e);
 		}
-	};
+	};
+
 	if (event === 'issues') {
-		const issueVal = payload.issue;
-		if (!issueVal || typeof issueVal !== 'object') return json({ ok: true, skipped: true });
-		const issue = issueVal as Record<string, unknown>;
-		const title = getString(issue, 'title');
-		const body = getString(issue, 'body') || '';
-		const htmlUrl = getString(issue, 'html_url');
-		const number = getNumber(issue, 'number');
-		const authorLogin = getLogin(issue.user);
+		const issue = payload.issue;
+		if (!issue) return json({ ok: true, skipped: true });
+		
+		const title = issue.title;
+		const body = issue.body || '';
+		const htmlUrl = issue.html_url;
+		const number = issue.number;
+		const authorLogin = issue.user?.login;
 		const reporterEmail = extractReporterEmail(body);
-		const assigneeLogin = getLogin(payload.assignee) || getLogin(issue.assignee);
+		const assigneeLogin = payload.assignee?.login || issue.assignee?.login;
+
 		if (['opened', 'closed', 'reopened', 'labeled', 'unlabeled'].includes(action)) {
-			const labelName = (() => {
-				const l = payload.label;
-				if (l && typeof l === 'object' && 'name' in l) {
-					const v = (l as Record<string, unknown>).name;
-					if (typeof v === 'string') return ` label:${v}`;
-				}
-				return '';
-			})();
+			const labelName = payload.label?.name ? ` label:${payload.label.name}` : '';
 			await safe(() =>
 				notifyCentral({
 					title: title || `Issue #${number ?? ''} ${action}`,
@@ -133,7 +143,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				const isOpened = action === 'opened';
 				const statusText = isOpened ? 'Opened' : action === 'closed' ? 'Closed' : 'Reopened';
 				const metaText = isOpened
-					? `<p style="margin:0"><strong>Status:</strong> Diterima dan menunggu review tim @polinema/ui</p>`
+					? `<p style="margin:0"><strong>Status:</strong> Diterima dan menunggu review tim (dilaporkan oleh ${senderLogin})</p>`
 					: `<p style="margin:0"><strong>Status:</strong> ${action} oleh ${senderLogin}</p>`;
 
 				await safe(() =>
@@ -150,10 +160,12 @@ export const POST: RequestHandler = async ({ request }) => {
 				);
 			}
 			return json({ ok: true });
-		}
+		}
+
 		if (action === 'assigned' && assigneeLogin) {
 			const assigneeEmail = resolveAssigneeEmail(assigneeLogin);
-			const assignedBy = senderLogin;
+			const assignedBy = senderLogin;
+
 			await safe(() =>
 				notifyCentral({
 					title: title || `Issue #${number ?? ''}`,
@@ -163,7 +175,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					htmlUrl,
 					badge: 'ISSUE ASSIGNED'
 				})
-			);
+			);
 			if (assigneeEmail) {
 				await safe(() =>
 					notifyAssignee({
@@ -177,7 +189,7 @@ export const POST: RequestHandler = async ({ request }) => {
 						issueNumber: number
 					})
 				);
-			}
+			}
 			if (reporterEmail) {
 				await safe(() =>
 					notifyRequester({
@@ -200,18 +212,19 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		return json({ ok: true, skipped: true, reason: `issue action ${action} ignored` });
-	}
+	}
+
 	if (event === 'pull_request') {
-		const prVal = payload.pull_request;
-		if (!prVal || typeof prVal !== 'object') return json({ ok: true, skipped: true });
-		const pr = prVal as Record<string, unknown>;
-		const title = getString(pr, 'title');
-		const body = getString(pr, 'body') || '';
-		const htmlUrl = getString(pr, 'html_url');
-		const number = getNumber(pr, 'number');
-		const authorLogin = getLogin(pr.user);
+		const pr = payload.pull_request;
+		if (!pr) return json({ ok: true, skipped: true });
+		
+		const title = pr.title;
+		const body = pr.body || '';
+		const htmlUrl = pr.html_url;
+		const number = pr.number;
+		const authorLogin = pr.user?.login;
 		const reporterEmail = extractReporterEmail(body);
-		const assigneeLogin = getLogin(payload.assignee);
+		const assigneeLogin = payload.assignee?.login;
 		const isMerged = pr.merged === true;
 
 		if (['opened', 'reopened', 'closed', 'labeled', 'unlabeled', 'synchronize', 'edited'].includes(action)) {
@@ -225,7 +238,7 @@ export const POST: RequestHandler = async ({ request }) => {
 					htmlUrl,
 					badge
 				})
-			);
+			);
 			if (action === 'closed' && reporterEmail) {
 				await safe(() =>
 					notifyRequester({
@@ -287,33 +300,33 @@ export const POST: RequestHandler = async ({ request }) => {
 		}
 
 		return json({ ok: true, skipped: true });
-	}
+	}
+
 	if (event === 'issue_comment' || event === 'pull_request_review_comment' || event === 'pull_request_review' || event === 'pull_request_review_thread') {
 		if (action !== 'created' && action !== 'submitted' && action !== 'resolved' && action !== 'unresolved') {
 			return json({ ok: true, skipped: true });
 		}
-		const issueVal = payload.issue || payload.pull_request;
+		const issue = payload.issue || payload.pull_request;
 		const commentVal = payload.comment || payload.review;
-		if (!issueVal || typeof issueVal !== 'object') return json({ ok: true, skipped: true });
-		const issue = issueVal as Record<string, unknown>;
-		const issueTitle = getString(issue, 'title') || 'Thread';
-		const issueBody = getString(issue, 'body') || '';
-		const issueHtmlUrl = getString(issue, 'html_url');
-		const issueNumber = getNumber(issue, 'number');
+		if (!issue) return json({ ok: true, skipped: true });
+		
+		const issueTitle = issue.title || 'Thread';
+		const issueBody = issue.body || '';
+		const issueHtmlUrl = issue.html_url;
+		const issueNumber = issue.number;
 		const reporterEmail = extractReporterEmail(issueBody);
 		if (!reporterEmail) return json({ ok: true, skipped: true });
 
 		let commentBody = '';
 		let commentUrl: string | undefined;
 		let commenter = senderLogin;
-		if (commentVal && typeof commentVal === 'object') {
-			const c = commentVal as Record<string, unknown>;
-			if (typeof c.body === 'string') commentBody = c.body;
-			if (typeof c.html_url === 'string') commentUrl = c.html_url;
-			const u = c.user;
-			const login = getLogin(u);
+		if (commentVal) {
+			if (typeof commentVal.body === 'string') commentBody = commentVal.body;
+			if (typeof commentVal.html_url === 'string') commentUrl = commentVal.html_url;
+			const login = commentVal.user?.login;
 			if (login) commenter = login;
-		}
+		}
+		
 		await safe(() =>
 			notifyRequester({
 				to: reporterEmail,
@@ -325,7 +338,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				body: commentBody || '(no body)',
 				htmlUrl: commentUrl || issueHtmlUrl
 			})
-		);
+		);
 		await safe(() =>
 			notifyCentral({
 				title: `Comment on ${issueTitle}`,

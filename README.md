@@ -9,12 +9,12 @@
 <br />
 
 <p align="center">
-  Lightweight GitHub PR & ticketing workflow — auto-link issues to pull requests, triage tickets, and track progress with email notifications. Built for the Polinema UI PBL ecosystem.
+  Lightweight GitHub PR & ticketing workflow - auto-link issues to pull requests, triage tickets, and track progress with email notifications. Built for the Polinema UI PBL ecosystem.
 </p>
 
 ## Overview
 
-Polinema Ticket connects GitHub issues and pull requests with a streamlined ticketing portal. Create tickets via structured issue templates (Bug Report, Component Request), auto-sync PR status via webhooks, and keep reporters in the loop through automated email notifications — all without leaving your development flow.
+Polinema Ticket connects GitHub issues and pull requests with a streamlined ticketing portal. Create tickets via structured issue templates (Bug Report, Component Request), auto-sync PR status via webhooks, and keep reporters in the loop through automated email notifications - all without leaving your development flow.
 
 Designed as a companion to [Polinema UI](https://github.com/polinema-ui/p-ui), the app adapts the same copy-and-paste, multi-ecosystem PBL architecture to project management for polytechnic lab workflows.
 

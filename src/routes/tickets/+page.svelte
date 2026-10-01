@@ -1,20 +1,17 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { resolve } from '@/app/paths';
-	import { HugeiconsIcon } from '@hugeicons/svelte';
-	import {
-		ArrowLeft01Icon,
-		GitPullRequestIcon,
-	} from '@hugeicons/core-free-icons';
 	import Button from '@/lib/components/ui/button/button.svelte';
-	import NewIssueModal from '@/lib/components/tickets/new-issue-modal.svelte';
-	import TicketCard from '@/lib/components/tickets/ticket-card.svelte';
-	import TicketSidebar from '@/lib/components/tickets/ticket-sidebar.svelte';
-	import TicketSkeleton from '@/lib/components/tickets/ticket-skeleton.svelte';
-	import SidebarSkeleton from '@/lib/components/tickets/sidebar-skeleton.svelte';
-	import TicketPagination from '@/lib/components/tickets/ticket-pagination.svelte';
-	import TicketFilters from '@/lib/components/tickets/ticket-filters.svelte';
 	import type { IssueItem, IssueTemplate } from '@/lib/types/ticket.js';
+	import NewIssueModal from '@/routes/tickets/components/new-issue-modal.svelte';
+	import SidebarSkeleton from '@/routes/tickets/components/sidebar-skeleton.svelte';
+	import TicketCard from '@/routes/tickets/components/ticket-card.svelte';
+	import TicketFilters from '@/routes/tickets/components/ticket-filters.svelte';
+	import TicketPagination from '@/routes/tickets/components/ticket-pagination.svelte';
+	import TicketSidebar from '@/routes/tickets/components/ticket-sidebar.svelte';
+	import TicketSkeleton from '@/routes/tickets/components/ticket-skeleton.svelte';
+	import { ArrowLeft01Icon, GitPullRequestIcon } from '@hugeicons/core-free-icons';
+	import { HugeiconsIcon } from '@hugeicons/svelte';
+	import { onMount } from 'svelte';
 
 	let selectedRepo = $state<string>('p-ui');
 	let activeTab = $state<'open' | 'closed' | 'all'>('open');
