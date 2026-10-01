@@ -119,9 +119,10 @@ export const GET: RequestHandler = async ({ fetch }) => {
 										name: l.name,
 										bg: `bg-[#${l.color}15]`,
 										text: `text-[#${l.color}]`,
-										border: `border-[#${l.color}30]`
+										border: `border-[#${l.color}30]`,
+										colorHex: l.color
 									}))
-								: [{ name: 'general', bg: 'bg-zinc-100', text: 'text-zinc-700' }],
+								: [{ name: 'general', bg: 'bg-zinc-100', text: 'text-zinc-700', colorHex: '52525b' }],
 							commentsCount: item.comments || 0,
 							author: {
 								name: item.user?.login || 'contributor',
