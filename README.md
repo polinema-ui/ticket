@@ -1,4 +1,4 @@
-<h1 align="center">Polinema Ticket</h1>
+<h1 align="center">@polinema/ticket</h1>
 
 <br />
 
